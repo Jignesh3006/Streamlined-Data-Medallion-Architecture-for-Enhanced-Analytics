@@ -1,10 +1,17 @@
 # Streamlined-Data-Medallion-Architecture-for-Enhanced-Analytics
 
 ## 📜 Table of Contents
-
-
-
-
+- [ProjectOverview](#project-overview-)
+- [Medallion Architecture](#what-is-the-medallion-architecture-)
+- [E-commerce database](#e-commerce-data-store)
+- [Building Analytical Platform](#building-the-analytics-platform)
+- [New EventStream](#create-a-new-event-stream)
+- [Generating Stream Data](#using-notebook-to-generate-the-stream-data)
+- [Destination Config](#define-destination-in-event-stream)
+- [Build KQL DB Schema](#build-the-kql-db-schema)
+- [Data Pipeline](#data-pipeline)
+- [Gold Layers Views](#materialized-view)
+- [Real Time Dashboard](#real---time-dashboard)
 
 # Project Overview : 
 
@@ -361,8 +368,41 @@ Creating an aggregated data using the Table which is present in the silver layer
 
 # Real - Time Dashboard
 
-Building a real time dashboard to visualise the streaming data
+Building a real time dashboard to visualise the streaming data.
+Below is the query to create the dashboard
+
+``` KQL
+-- TotalClicks Over Time
+
+DemoEvents
+| where eventType == "CLICK"
+| summarize TotalClicks = count() by bin(eventDate, 1d)
+| render timechart
+
+-- Average Page Load Time
+
+DemoEvents
+| where eventDate   between (datetime(2024-01-01)..datetime(2024-06-30)) and eventType == "IMPRESSION" 
+| summarize average_loadtime = avg(page_loading_seconds) by bin(eventDate, 1d) 
+| render linechart 
+
+-- TotalImpressions over Time
+DemoEvents
+| where eventType == "IMPRESSION"
+| summarize TotalImpressions = count() by bin(eventDate, 1d)
+| render timechart
+
+-- Average Page Load Time Per Device Type
+DemoEvents
+| summarize AvgLoadTime = avg(page_loading_seconds) by device
+| render piechart
+
+```
+
+
 ![AltImage](https://github.com/Jignesh3006/Streamlined-Data-Medallion-Architecture-for-Enhanced-Analytics/blob/main/Images/Step%20-%2015.png)
+
+
 
 
 
